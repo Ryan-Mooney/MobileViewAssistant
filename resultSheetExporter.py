@@ -1,7 +1,7 @@
 from assetFileLoader import *
 from MobileViewAssetFinder import *
 from dbManagement import *
-import xlwt, datetime
+import xlwt, datetime, os
 
 #Exports Data to Excel Report using the assetList
 def exportToExcel(assetList, trial, floor_counter, floor_list):
@@ -75,8 +75,15 @@ def exportToExcel(assetList, trial, floor_counter, floor_list):
     #sheet3=autoAdjustColWidth(sheet3)
     
     #Creates name for File
+    cwd=os.getcwd()
     name='Asset Results'+' - Trial '+str(trial)+' - '+datetime.datetime.today().strftime('%m-%d-%Y')+'.xls'
-    book.save('./Trial Results/'+name)
+    try:
+        os.mkdir(cwd+'\\Trial Results\\')
+    except:
+        pass
+    book.save(cwd+'\\Trial Results\\'+name)
+    name=cwd+'\\Trial Results\\'+name
+    #'./Trial Results/'+
     return(name)
 
 def autoAdjustColWidth(worksheet):

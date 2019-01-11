@@ -1,4 +1,4 @@
-import os, time
+import os, time, sys
 from PIL import Image, ImageTk
 from tkinter import Tk, RIGHT, BOTH, RAISED, Text, X, N, LEFT, Menu, END, filedialog
 from tkinter.ttk import Frame, Label, Style, Button, Entry
@@ -57,7 +57,7 @@ class MainDialog(Frame):
         
         fileMenu = Menu(menubar)
         fileMenu.add_command(label="Load Asset File", command=self.onOpen)
-        fileMenu.add_command(label="Close", command=quit)
+        fileMenu.add_command(label="Close", command=sys.exit)
         menubar.add_cascade(label="File", menu=fileMenu)
 
         #Status Indicator
@@ -71,7 +71,7 @@ class MainDialog(Frame):
         
         okButton = Button(self, text="Run", command=lambda: self.mainProgram(entry1.get(), entry2.get(), self.assetFile))
         okButton.grid(row=6, column=2, sticky="WE")
-        closeButton = Button(self, text="Close", command=quit) #use quit to close window
+        closeButton = Button(self, text="Close", command=sys.exit) #use quit to close window
         closeButton.grid(row=6, column=3, sticky="E")
 
         self.pack(fill=BOTH, expand=1)
@@ -96,8 +96,8 @@ class MainDialog(Frame):
         self.root.update()
         file=exportToExcel(assetList, trial, floor_counter, floor_list)
         self.lbl6.config(text='Completed!')
-        cwd = os.getcwd()
-        os.startfile(cwd+'/Trial Results/'+file)
+        self.root.update()
+        os.startfile(file)
         
     def centerWindow(self):
       
