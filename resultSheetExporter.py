@@ -9,7 +9,7 @@ def exportToExcel(assetList, trial, floor_counter, floor_list):
     styleHeader=xlwt.easyxf('font: name Times New Roman, height 280, bold on')
     styleSubheader=xlwt.easyxf('font: name Times New Roman, height 240, bold on')
     styleNormal=xlwt.easyxf('font: name Times New Roman, height 240')
-    styleSpecial=xlwt.easyxf('font: name Times New Roman, height 240, bold on; pattern: pattern solid, fore_colour green')
+    styleSpecial=xlwt.easyxf('font: name Times New Roman, height 240, bold on; pattern: pattern solid, fore_colour light_green')
 
     #Initializes first row for the Asset Info sheet
     sheet1 = book.add_sheet("Asset Info")
