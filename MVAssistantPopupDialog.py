@@ -9,7 +9,9 @@ from dbManagement import *
 from resultSheetExporter import *
 from resultsEmailer import *
 
-os.chdir("../..")
+
+#Uncheck this when compiling into standalone app with pyinstaller
+#os.chdir("../..")
 
 class MainDialog(Frame):
 
@@ -110,10 +112,6 @@ class MainDialog(Frame):
         self.centerWindow()
 
     def mainProgram(self, username, password, assetfile, trial_type, admin_access, test_case, email_results): 
-        #Comment this out when exporting to app via pyinstaller to ensure the correct cwd
-        
-        print(os.getcwd())
-
         #Compiles a dictionary with each asset and its descriptors
         self.lbl6.config(text='...Finding assets...')
         self.root.update()

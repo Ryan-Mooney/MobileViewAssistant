@@ -64,6 +64,7 @@ def assign_trial_number(assetList, connection, trial_type):
         assetList[asset]['Trial']=trial
     return(assetList, trial)
 
+#Creates a random datapoint for use in db testing
 def create_random_datapoint():
     connection=create_connection("assetDB.db")
     asset_datapoint=('1000010', str(datetime.date.today()), str(datetime.datetime.now().time()), str(datetime.datetime.now()), 'Alaris IV Pump Module', '12', 'December', 'Floor 9')

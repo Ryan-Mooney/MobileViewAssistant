@@ -66,11 +66,30 @@ def exportToExcel(assetList, trial, floor_counter, floor_list):
 
     for location in sorted(floor_list.keys()):
         sheet3.write(i, 0, location, styleSubheader)
+        i+=1
         for asset in sorted(floor_list[location]):
             sheet3.write(i, 1, asset, styleNormal)
             if assetList[asset]['PM Month']:
                 sheet3.write(i, 2, assetList[asset]['PM Month'], styleNormal)
             i+=1
+
+    #Initializes first row for the Assets by PM Month sheet
+    sheet3 = book.add_sheet("Assets by PM Month")
+    sheet3.write(0, 0, "PM Month", styleHeader)
+    sheet3.write(0, 1, "Asset", styleHeader)
+    sheet3.write(0, 2, "Location", styleHeader)
+    sheet3.col(0).width, sheet3.col(1).width, sheet3.col(2).width = 5200, 3000, 5200
+    i=1
+
+    pm_months=['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+    for pm_month in pm_months:
+        sheet3.write(i, 0, pm_month, styleSubheader)
+        i+=1
+        for asset in sorted(assetList.keys()):
+            if assetList[asset]['PM Month']==pm_month:
+                sheet3.write(i, 1, asset, styleNormal)
+                sheet3.write(i, 2, assetList[asset]['Location'], styleNormal)
+                i+=1
 
     #sheet3=autoAdjustColWidth(sheet3)
     
@@ -83,7 +102,6 @@ def exportToExcel(assetList, trial, floor_counter, floor_list):
         pass
     book.save(cwd+'\\Trial Results\\'+name)
     name=cwd+'\\Trial Results\\'+name
-    #'./Trial Results/'+
     return(name)
 
 def autoAdjustColWidth(worksheet):
@@ -101,11 +119,11 @@ def autoAdjustColWidth(worksheet):
      return(worksheet)
 
 #Used for test purposes
-##username='adsf'
-##password='asdf'
-##assetfile='./AssetListTest.xlsx'
-##assetList, floor_counter, floor_list=get_asset_locations(username, password, assetListCreator(assetfile))
-##connection=connect()
-##assetList, trial=assign_trial_number(assetList, connection)
-##
-##exportToExcel(assetList, trial, floor_counter, floor_list)
+username='adsf'
+password='asdf'
+assetfile='./DefaultAssetList.xlsx'
+assetList, floor_counter, floor_list=get_asset_locations_test(username, password, assetListCreator(assetfile, trial_type='All Assets'))
+connection=connect()
+assetList, trial=assign_trial_number(assetList, connection, trial_type='All Assets')
+
+exportToExcel(assetList, trial, floor_counter, floor_list)
