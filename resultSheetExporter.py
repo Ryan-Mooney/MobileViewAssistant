@@ -17,7 +17,7 @@ def exportToExcel(assetList, trial, floor_counter, floor_list):
     sheet1.write(0, 1, "Location", styleHeader)
     sheet1.write(0, 2, "Type", styleHeader)
     sheet1.write(0, 3, "PM Month", styleHeader)
-    sheet1.col(0).width, sheet1.col(1).width, sheet1.col(2).width,  sheet1.col(3).width = 5200, 5200, 6240, 5200
+    sheet1.col(0).width, sheet1.col(1).width, sheet1.col(2).width,  sheet1.col(3).width = 5200, 13000, 6240, 5200
     i=1
     
     for asset in sorted(assetList.keys()):
@@ -37,7 +37,7 @@ def exportToExcel(assetList, trial, floor_counter, floor_list):
     sheet2.write(0, 1, "Type", styleHeader)
     sheet2.write(0, 2, "Number", styleHeader)
     #sheet2.write(0, 3, "Change", styleHeader)
-    sheet2.col(0).width, sheet2.col(1).width, sheet2.col(2).width = 5200, 6240, 5200
+    sheet2.col(0).width, sheet2.col(1).width, sheet2.col(2).width = 13000, 6240, 5200
     i=1
     total=0
     
@@ -61,7 +61,7 @@ def exportToExcel(assetList, trial, floor_counter, floor_list):
     sheet3.write(0, 0, "Location", styleHeader)
     sheet3.write(0, 1, "Asset", styleHeader)
     sheet3.write(0, 2, "PM Month", styleHeader)
-    sheet3.col(0).width, sheet3.col(1).width, sheet3.col(2).width = 3200, 3000, 5200
+    sheet3.col(0).width, sheet3.col(1).width, sheet3.col(2).width = 13000, 3000, 5200
     i=1
 
     for location in sorted(floor_list.keys()):
@@ -78,7 +78,7 @@ def exportToExcel(assetList, trial, floor_counter, floor_list):
     sheet3.write(0, 0, "PM Month", styleHeader)
     sheet3.write(0, 1, "Asset", styleHeader)
     sheet3.write(0, 2, "Location", styleHeader)
-    sheet3.col(0).width, sheet3.col(1).width, sheet3.col(2).width = 5200, 3000, 5200
+    sheet3.col(0).width, sheet3.col(1).width, sheet3.col(2).width = 5200, 3000, 13000
     i=1
 
     pm_months=['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
@@ -118,12 +118,12 @@ def autoAdjustColWidth(worksheet):
      worksheet.column_dimensions[column].width = adjusted_width
      return(worksheet)
 
-#Used for test purposes
-username='adsf'
-password='asdf'
-assetfile='./DefaultAssetList.xlsx'
-assetList, floor_counter, floor_list=get_asset_locations_test(username, password, assetListCreator(assetfile, trial_type='All Assets'))
-connection=connect()
-assetList, trial=assign_trial_number(assetList, connection, trial_type='All Assets')
-
-exportToExcel(assetList, trial, floor_counter, floor_list)
+###Used for test purposes
+##username='adsf'
+##password='asdf'
+##assetfile='./DefaultAssetList.xlsx'
+##assetList, floor_counter, floor_list=get_asset_locations_test(username, password, assetListCreator(assetfile, trial_type='All Assets'))
+##connection=connect()
+##assetList, trial=assign_trial_number(assetList, connection, trial_type='All Assets')
+##
+##exportToExcel(assetList, trial, floor_counter, floor_list)

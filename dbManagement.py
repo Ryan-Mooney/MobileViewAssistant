@@ -30,7 +30,9 @@ def connect():
     return(connection)
 
 #Takes each asset, determine what data descriptors are present, and saves them to the database
-def save_to_db(assetList):
+def save_to_db(assetList, root, lbl6, connection):
+    i=1
+    cur=connection.cursor()
     for asset in assetList.keys():
         #Creates sql entry query for each asset based on the info provided
         asset_data=[asset]
@@ -55,11 +57,15 @@ def save_to_db(assetList):
         sql_text=sql_text+', location'
         values_text=values_text+', ?'
         #Saves each datapoint to database
-        create_asset_data(asset_data, sql_text, values_text)
+        create_asset_data(asset_data, sql_text, values_text, cur)
+        #Progress Bar
+        lbl6.config(text="...Saving Data..."+str(int(i/len(assetList.keys())*100))+"% Complete")
+        i+=1
+        root.update()
 
 #Creates a unique trial number to identify each datapoint as being from the same trial and adds it to the assets dictionary data
-def assign_trial_number(assetList, connection, trial_type):
-    trial=create_trial_data(connection, trial_type)
+def assign_trial_number(assetList, connection, trial_type, test_case_indicator):
+    trial=create_trial_data(connection, trial_type, test_case_indicator)
     for asset in assetList:
         assetList[asset]['Trial']=trial
     return(assetList, trial)
@@ -72,15 +78,15 @@ def create_random_datapoint():
     return(asset_id)
 
 #Used to save datapoint to database and return its id if needed
-def create_asset_data(asset_data, sql_text, values_text):
-    connection=create_connection("assetDB.db")
+def create_asset_data(asset_data, sql_text, values_text, cur):
     sql=' INSERT INTO AssetData('+sql_text+') VALUES('+values_text+') '
-    cur=connection.cursor()
     cur.execute(sql, asset_data)
     return cur.lastrowid
 
 #Creates and returns a unique trial number identifier
-def create_trial_data(connection, trial_type):
+def create_trial_data(connection, trial_type, trial_case_indicator):
+    if trial_case_indicator==1:
+        trial_type="TEST"
     trial_type=[trial_type, str(datetime.date.today()), str(datetime.datetime.now().time()), str(datetime.datetime.now())]
     sql=''' INSERT INTO TrialNumber(trial_type, date_ran, time_ran, date_time_ran)
               VALUES(?, ?, ?, ?) '''

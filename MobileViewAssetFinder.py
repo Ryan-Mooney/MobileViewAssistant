@@ -1,18 +1,9 @@
-#Mobileview Assistant - Asset Finder and Organizer
-#Developed by Ryan Mooney, BMET II, at Mercy Medical Center - Cedar Rapids, IA
-
-#Requires IEDriverSoftware, found here: https://stackoverflow.com/questions/24925095/selenium-python-internet-explorer
-    #Use 32 bit one
-    #IEDriver must also be added to PATH to function properly
-#Additionally requires the Selenium library for python
-
-
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import random
+import random, time
 
 #Initialize variables for test purposes
 username="rmooney"
@@ -22,10 +13,16 @@ possible_locations=['Floor 9', 'Floor 8', 'Floor -2', 'Floor 3', 'Floor -1', 'Fl
 
 
 #Used for testing purposes without needing to have MobileView
-def get_asset_locations_test(username, password, assetList):
+def get_asset_locations_test(username, password, assetList, root, lbl6):
     possible_floors= ['Floor Ground', 'Floor 1', 'Floor 2', 'Floor 3', 'Floor 4', 'Floor 5','Floor 6', 'Floor 7', 'Floor 8', 'Floor 9']
     floor_counter={}
     floor_list={}
+    i=1
+    try:
+        driver=webdriver.Ie()
+    except:
+        lbl6.config(text="Driver not set up")
+        return()
     for asset in assetList:
         random_floor=possible_floors[random.randrange(len(possible_floors))]
         assetList[asset]['Location']=random_floor
@@ -40,13 +37,17 @@ def get_asset_locations_test(username, password, assetList):
             floor_list[random_floor].append(asset)
         else:
             floor_list[random_floor]=[asset]
+        #Progress Bar
+        lbl6.config(text="...Finding Assets..."+str(int(i/len(assetList)*100))+"% Complete")
+        i+=1
+        root.update()
     return(assetList, floor_counter, floor_list)
         
     
 
 #Finding assets through admin menus
 
-def get_asset_locations_admin(username, password, assetList):
+def get_asset_locations_admin(username, password, assetList, root, lbl6):
     #Initialize driver and travel to Mobileview
     driver = webdriver.Ie()
     driver.get("http://mobileview/asset-manager-web/core/pages/login/login.jsf")
@@ -73,7 +74,7 @@ def get_asset_locations_admin(username, password, assetList):
     #Initialize counters
     floor_counter={}
     floor_list={}
-
+    i=1
     #Begin asset finding loop
     for asset in assetList:
         #Enter Asset Number
@@ -105,6 +106,10 @@ def get_asset_locations_admin(username, password, assetList):
             floor_list[floor].append(asset)
         else:
             floor_list[floor]=[asset]
+        #Progress Bar
+        lbl6.config(text="...Finding Assets..."+str(int(i/len(assetList)*100))+"% Complete")
+        i+=1
+        root.update()
     driver.close()
     return(assetList, floor_counter, floor_list)
 
@@ -112,7 +117,7 @@ def get_asset_locations_admin(username, password, assetList):
 
 #Finding assets with regular menu
     
-def get_asset_locations_nonadmin(username, password, assetList):
+def get_asset_locations_nonadmin(username, password, assetList, root, lbl6):
     #Initialize driver and travel to Mobileview
     driver = webdriver.Ie()
     driver.get("http://mobileview/asset-manager-web/core/pages/login/login.jsf")
@@ -135,6 +140,7 @@ def get_asset_locations_nonadmin(username, password, assetList):
     #Initialize counters
         floor_counter={}
         floor_list={}
+        i=1
     #Begin loop for pump locator
     for asset in assetList:
         #Enter Asset Number
@@ -167,5 +173,9 @@ def get_asset_locations_nonadmin(username, password, assetList):
             floor_list[floor].append(asset)
         else:
             floor_list[floor]=[asset]
+        #Progress Bar
+        lbl6.config(text="...Finding Assets..."+str(int(i/len(assetList)*100))+"% Complete")
+        i+=1
+        root.update()
     driver.close()
     return(assetList, floor_counter, floor_list)

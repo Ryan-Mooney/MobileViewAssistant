@@ -1,3 +1,12 @@
+#Mobileview Assistant - Asset Finder and Organizer
+#Developed by Ryan Mooney, BMET II, at Mercy Medical Center - Cedar Rapids, IA
+
+#Requires IEDriverSoftware, found here: https://stackoverflow.com/questions/24925095/selenium-python-internet-explorer
+    #Use 32 bit one
+    #IEDriver must also be added to PATH to function properly
+#Additionally requires the Selenium library for python
+
+
 import os, time, sys
 #from PIL import Image, ImageTk
 from tkinter import *
@@ -44,6 +53,7 @@ class MainDialog(Frame):
         self.root.rowconfigure(8, pad=10)
         self.root.rowconfigure(9, pad=10)
         self.root.rowconfigure(10, pad=10)
+        self.root.rowconfigure(11, pad=10)
 
         self.root.columnconfigure(1, pad=5)
         self.root.columnconfigure(2, pad=5)
@@ -87,7 +97,7 @@ class MainDialog(Frame):
         self.admin_access=IntVar(value=1)
         Checkbutton(self.root, text="I have access to Mobile View Admin.", variable=self.admin_access).grid(row=6, column=1, columnspan=3, sticky=W)
 
-        #Admin Access Checker
+        #Run a test only Checker
         self.test_case=IntVar(value=0)
         Checkbutton(self.root, text="Run a test trial only.", variable=self.test_case).grid(row=7, column=1, columnspan=3, sticky=W)
 
@@ -98,8 +108,8 @@ class MainDialog(Frame):
         #Status Indicator
         lbl5 = Label(self.root, text="Status:", width=10)
         lbl5.grid(row=9, column=1)
-        self.lbl6 = Label(self.root, text="", width=20)
-        self.lbl6.grid(row=9, column=2)
+        self.lbl6 = Label(self.root, text="...Awaiting Inputs...", width=30)
+        self.lbl6.grid(row=9, column=2, columnspan=2)
         
         #Ok and close button
         
@@ -108,6 +118,10 @@ class MainDialog(Frame):
         okButton.grid(row=10, column=2, sticky="WE")
         closeButton = Button(self.root, text="Close", command=sys.exit) #use quit to close window
         closeButton.grid(row=10, column=3, sticky="E")
+
+        #Copyright Line
+        lbl8 = Label(self.root, text="© Ryan Mooney Industries", width=10)
+        lbl8.grid(row=11, column=1, columnspan=3, sticky="WE")
 
         self.centerWindow()
 
@@ -118,18 +132,18 @@ class MainDialog(Frame):
 
         #Determines how to find asset locations
         if test_case==1:
-            assetList, floor_counter, floor_list=get_asset_locations_test(username, password, assetListCreator(assetfile, trial_type))
+            assetList, floor_counter, floor_list=get_asset_locations_test(username, password, assetListCreator(assetfile, trial_type), self.root, self.lbl6)
         elif admin_access==1:
-            assetList, floor_counter, floor_list=get_asset_locations_admin(username, password, assetListCreator(assetfile, trial_type))
+            assetList, floor_counter, floor_list=get_asset_locations_admin(username, password, assetListCreator(assetfile, trial_type), self.root, self.lbl6)
         else:
-            assetList, floor_counter, floor_list=get_asset_locations_nonadmin(username, password, assetListCreator(assetfile, trial_type))
+            assetList, floor_counter, floor_list=get_asset_locations_nonadmin(username, password, assetListCreator(assetfile, trial_type), self.root, self.lbl6)
         
         #Saves each new asset data point to database with unique 'trial' number
         self.lbl6.config(text='...Saving Data...')
         self.root.update()
         connection=connect()
-        assetList, trial=assign_trial_number(assetList, connection, trial_type)
-        save_to_db(assetList)
+        assetList, trial=assign_trial_number(assetList, connection, trial_type, test_case)
+        save_to_db(assetList, self.root, self.lbl6, connection)
         connection.close()
 
         #Creates and Exports Data to Excel
@@ -153,7 +167,7 @@ class MainDialog(Frame):
     def centerWindow(self):
       
         w = 300
-        h = 350
+        h = 375
 
         sw = self.master.winfo_screenwidth()
         sh = self.master.winfo_screenheight()
