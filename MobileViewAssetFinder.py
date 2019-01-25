@@ -5,12 +5,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import random, time
 
-#Initialize variables for test purposes
-username="rmooney"
-password="Moondawg422#"
-assetList=['1000000', '1000020', '1000500', '1002566', '1000007', '1005848']
-possible_locations=['Floor 9', 'Floor 8', 'Floor -2', 'Floor 3', 'Floor -1', 'Floor 6']
-
 
 #Used for testing purposes without needing to have MobileView
 def get_asset_locations_test(username, password, assetList, root, lbl6):
@@ -20,12 +14,14 @@ def get_asset_locations_test(username, password, assetList, root, lbl6):
     i=1
     try:
         driver=webdriver.Ie()
+        driver.close()
     except:
         lbl6.config(text="Driver not set up")
         return()
     for asset in assetList:
         random_floor=possible_floors[random.randrange(len(possible_floors))]
         assetList[asset]['Location']=random_floor
+        assetList[asset]['Battery Status']=str(random.randint(1, 101))+'%'
         if random_floor in floor_counter:
             if assetList[asset]['Type'] in floor_counter[random_floor]:
                 floor_counter[random_floor][assetList[asset]['Type']]+=1
@@ -86,13 +82,32 @@ def get_asset_locations_admin(username, password, assetList, root, lbl6):
         elem.send_keys(str(asset))
         elem=driver.find_element_by_id("mainForm:assign_assets_selection_search_button_id").click()
 
-        #Find floor of asset
+        #Find floor of asset and battery life
         try:
-            element=WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.ID, "mainForm:adminAssetsTable:0:j_id_58")))
+            element=WebDriverWait(driver, 2).until(EC.presence_of_element_located((By.ID, "mainForm:adminAssetsTable:0:j_id_58")))
             floor=driver.find_element_by_id("mainForm:adminAssetsTable:0:j_id_58").text
+            #Check if Floor 3 is in HPCC or Mercy Main
+            if floor=="Floor 3":
+                try:
+                    check_floor=driver.find_element_by_xpath('//*[@title="Hall Perrine Cancer Center/Floor 3/Floor 3"]').text
+                    floor="HPCC"
+                except:
+                    floor="Floor 3"
             assetList[asset]['Location']=floor
+            #Looks for Battery Status
+            try:
+                battery=driver.find_element_by_class_name("tagBatteryInListRowCss").text
+                battery=battery.replace("&nbsp;", "")
+                battery=battery.replace(" ","")
+                if battery=="" or battery==" ":
+                    battery="100%"
+                assetList[asset]['Battery Status']=battery
+            except:
+                assetList[asset]['Battery Status']=''
+        #If initial screen times out, the asset is MIA
         except:
             assetList[asset]['Location']='CNL'
+            assetList[asset]['Battery Status']=''
         floor=assetList[asset]['Location']
         #Determines if the found floor is in either list, adds it if necessary, then appends the asset and increases counter
         if floor in floor_counter:
@@ -145,7 +160,7 @@ def get_asset_locations_nonadmin(username, password, assetList, root, lbl6):
     for asset in assetList:
         #Enter Asset Number
         try:
-            element=WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.ID, "mainForm:freeTextInput")))
+            element=WebDriverWait(driver, 2).until(EC.presence_of_element_located((By.ID, "mainForm:freeTextInput")))
         finally:
             elem=driver.find_element_by_id("mainForm:freeTextInput")
         elem.clear()
@@ -154,8 +169,13 @@ def get_asset_locations_nonadmin(username, password, assetList, root, lbl6):
     
         #Find floor of asset
         try:
-            element=WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.ID, "mainForm:j_id_1q_5_i_2_3:3:ViewAreaChainList")))
+            element=WebDriverWait(driver, 2).until(EC.presence_of_element_located((By.ID, "mainForm:j_id_1q_5_i_2_3:3:ViewAreaChainList")))
             elem=driver.find_element_by_id("mainForm:j_id_1q_5_i_2_3:3:ViewAreaChainList").text
+            #Checks which building Floor 3's are in
+            if floor=="Floor 3":
+                check_floor=driver.find_element_by_id("mainForm:j_id_1q_5_i_2_3:2:ViewAreaChainList").text
+                if check_floor=="Hall Perrine Cancer Center":
+                    elem="HPCC"
             assetList[asset]['Location']=elem
             elem=driver.find_element_by_id("locatorNavSimpleButton_middle").click()
         except:

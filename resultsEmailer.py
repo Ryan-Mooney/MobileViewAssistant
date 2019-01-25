@@ -5,13 +5,10 @@ from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from email.mime.application import MIMEApplication
 from email import encoders
+from credentials import *
 
 def send_results(file, email_file):
     #Sets up SMTP settings and creates mailing list
-    EMAIL_HOST= 'smtp.gmail.com'
-    EMAIL_PORT= 587
-    EMAIL_HOST_USER= 'mooneyryanj@gmail.com'
-    EMAIL_HOST_PASSWORD= 'Moondawg422!'
     email_list=open(email_file, "r")
     email_addresses = email_list.read().split(';')
 
@@ -19,8 +16,8 @@ def send_results(file, email_file):
     msgRoot=MIMEMultipart('related')
     msgRoot['From']='mooneyryanj@gmail.com'
     msgRoot['To']=", ".join(email_addresses)
-    msgRoot['Subject']='Asset Location Results'
-    message = 'Attached please find the asset location results for '+str(datetime.date.today())
+    msgRoot['Subject']='Asset Location Results for '+str(datetime.date.today())
+    message = 'Attached please find the asset location results for '+str(datetime.date.today()+'</br></br>Signed,</br>The Pump Whisperer</br></br>')
     msgText=MIMEText(message, 'html')
     msgRoot.attach(msgText)
 
@@ -37,3 +34,4 @@ def send_results(file, email_file):
     smtp.login(EMAIL_HOST_USER, EMAIL_HOST_PASSWORD)
     smtp.sendmail(EMAIL_HOST_USER, email_addresses, msgRoot.as_string())
     smtp.quit()
+

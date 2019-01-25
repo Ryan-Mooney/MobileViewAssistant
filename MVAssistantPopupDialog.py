@@ -21,7 +21,6 @@ from resultsEmailer import *
 
 #Uncheck this when compiling into standalone app with pyinstaller
 #os.chdir("../..")
-
 class MainDialog(Frame):
 
     def __init__(self, root):
@@ -132,6 +131,7 @@ class MainDialog(Frame):
 
         #Determines how to find asset locations
         if test_case==1:
+            trial_type='TEST'
             assetList, floor_counter, floor_list=get_asset_locations_test(username, password, assetListCreator(assetfile, trial_type), self.root, self.lbl6)
         elif admin_access==1:
             assetList, floor_counter, floor_list=get_asset_locations_admin(username, password, assetListCreator(assetfile, trial_type), self.root, self.lbl6)
@@ -149,7 +149,7 @@ class MainDialog(Frame):
         #Creates and Exports Data to Excel
         self.lbl6.config(text='...Exporting to Excel...')
         self.root.update()
-        file=exportToExcel(assetList, trial, floor_counter, floor_list)
+        file=exportToExcel(assetList, trial, floor_counter, floor_list, trial_type)
 
         #Sends results to email addresses if requested
         if email_results==1:
