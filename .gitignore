@@ -1,5 +1,8 @@
 credentials.py
-Test Files/
-Test Results/
+Test_Files
+Trial_Results
+build
+dist
+__pycache__
 assetdb.db
 ResultsMailingList.txt
