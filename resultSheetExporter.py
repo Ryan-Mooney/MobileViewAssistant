@@ -21,7 +21,8 @@ def exportToExcel(assetList, trial, floor_counter, floor_list, trial_type):
     sheet1.write(0, 4, "Battery Life", styleHeader)
     sheet1.col(0).width, sheet1.col(1).width, sheet1.col(2).width,  sheet1.col(3).width, sheet1.col(3).width = 5200, 9600, 7600, 6240, 4600
     i=1
-    
+
+    #A complete list of all the assets and their information
     for asset in sorted(assetList.keys()):
         sheet1.write(i, 0, asset, styleNormal)
         sheet1.write(i, 1, assetList[asset]['Location'], styleNormal)
@@ -47,7 +48,8 @@ def exportToExcel(assetList, trial, floor_counter, floor_list, trial_type):
     sheet2.col(0).width, sheet2.col(1).width, sheet2.col(2).width = 10400, 7600, 5200
     i=1
     total=0
-    
+
+    #For each location, a summary of the pumps found there are given
     for location in sorted(floor_counter.keys()):
         sheet2.write(i, 0, location, styleSubheader)
         for assetType in sorted(floor_counter[location].keys()):
@@ -73,6 +75,7 @@ def exportToExcel(assetList, trial, floor_counter, floor_list, trial_type):
     sheet3.col(0).width, sheet3.col(1).width, sheet3.col(2).width, sheet3.col(3).width, sheet3.col(4).width = 9600, 3000, 6240, 7600, 4600
     i=1
 
+    #For each Location, the assets found for each are listed
     for location in sorted(floor_list.keys()):
         sheet3.write(i, 0, location, styleSubheader)
         i+=1
@@ -99,6 +102,7 @@ def exportToExcel(assetList, trial, floor_counter, floor_list, trial_type):
     sheet4.col(0).width, sheet4.col(1).width, sheet4.col(2).width, sheet4.col(3).width, sheet4.col(4).width = 6240, 3000, 9600, 7600, 4600
     i=1
 
+    #For each PM month, the list of assets found are given
     pm_months=['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
     for pm_month in pm_months:
         sheet4.write(i, 0, pm_month, styleSubheader)
@@ -115,8 +119,6 @@ def exportToExcel(assetList, trial, floor_counter, floor_list, trial_type):
                     else:
                         sheet4.write(i, 4, assetList[asset]['Battery Status'], styleNormal)
                 i+=1
-
-    #sheet3=autoAdjustColWidth(sheet3)
     
     #Creates name for File
     cwd=os.getcwd()

@@ -3,6 +3,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from credentials import *
 import random, time
 
 
@@ -46,7 +47,7 @@ def get_asset_locations_test(username, password, assetList, root, lbl6):
 def get_asset_locations_admin(username, password, assetList, root, lbl6):
     #Initialize driver and travel to Mobileview
     driver = webdriver.Ie()
-    driver.get("http://mobileview/asset-manager-web/core/pages/login/login.jsf")
+    driver.get(MV_URL)
 
     #Login to Mobileview
     elem = driver.find_element_by_name("j_username")
@@ -135,7 +136,7 @@ def get_asset_locations_admin(username, password, assetList, root, lbl6):
 def get_asset_locations_nonadmin(username, password, assetList, root, lbl6):
     #Initialize driver and travel to Mobileview
     driver = webdriver.Ie()
-    driver.get("http://mobileview/asset-manager-web/core/pages/login/login.jsf")
+    driver.get(MV_URL)
 
     #Login to Mobileview
     elem = driver.find_element_by_name("j_username")

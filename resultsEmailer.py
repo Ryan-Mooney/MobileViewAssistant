@@ -17,7 +17,7 @@ def send_results(file, email_file):
     msgRoot['From']='mooneyryanj@gmail.com'
     msgRoot['To']=", ".join(email_addresses)
     msgRoot['Subject']='Asset Location Results for '+str(datetime.date.today())
-    message = 'Attached please find the asset location results for '+str(datetime.date.today()+'</br></br>Signed,</br>The Pump Whisperer</br></br>')
+    message = 'Attached please find the asset location results for '+str(datetime.date.today())+'</br></br>Signed,</br>The Pump Whisperer</br></br>')
     msgText=MIMEText(message, 'html')
     msgRoot.attach(msgText)
 
