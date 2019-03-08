@@ -57,20 +57,33 @@ class MainDialog(Frame):
         self.root.columnconfigure(1, pad=5)
         self.root.columnconfigure(2, pad=5)
         self.root.columnconfigure(3, pad=5)
+        self.root.columnconfigure(4, pad=5)
 
         #Username area
-        lbl1 = Label(self.root, text="Username:", width=10)
+        lbl1 = Label(self.root, text="MV Username:", width=15)
         lbl1.grid(row=1, column=1)           
        
-        entry1 = Entry(self.root)
-        entry1.grid(row=1, column=2)
+        MVUsername = Entry(self.root)
+        MVUsername.grid(row=1, column=2)
+
+        lbl9 = Label(self.root, text="RSQ Username:", width=15)
+        lbl9.grid(row=1, column=3)           
+       
+        RSQUsername = Entry(self.root)
+        RSQUsername.grid(row=1, column=4)
 
         #Password area
-        lbl2 = Label(self.root, text="Password:", width=10)
+        lbl2 = Label(self.root, text="MV Password:", width=15)
         lbl2.grid(row=2, column=1)        
 
-        entry2 = Entry(self.root, show="*")
-        entry2.grid(row=2, column=2)
+        MVPassword = Entry(self.root, show="*")
+        MVPassword.grid(row=2, column=2)
+
+        lbl10 = Label(self.root, text="RSQ Password:", width=15)
+        lbl10.grid(row=2, column=3)        
+
+        RSQPassword = Entry(self.root, show="*")
+        RSQPassword.grid(row=2, column=4)
 
         #File area        
         lbl3 = Label(self.root, text="Asset File:", width=10)
@@ -94,66 +107,77 @@ class MainDialog(Frame):
 
         #Admin Access Checker
         self.admin_access=IntVar(value=1)
-        Checkbutton(self.root, text="I have access to Mobile View Admin.", variable=self.admin_access).grid(row=6, column=1, columnspan=3, sticky=W)
+        Checkbutton(self.root, text="I have access to Mobile View Admin.", variable=self.admin_access).grid(row=6, column=1, columnspan=2, sticky=W)
+
+        #Active PMs only Checker
+        self.cross_checker=IntVar(value=1)
+        Checkbutton(self.root, text="Print only the active PMs.", variable=self.admin_access).grid(row=7, column=1, columnspan=2, sticky=W)
 
         #Run a test only Checker
         self.test_case=IntVar(value=0)
-        Checkbutton(self.root, text="Run a test trial only.", variable=self.test_case).grid(row=7, column=1, columnspan=3, sticky=W)
+        Checkbutton(self.root, text="Run a test trial only.", variable=self.test_case).grid(row=6, column=3, columnspan=2, sticky=W)
 
         #Email Results Checker
         self.email_results=IntVar(value=0)
-        Checkbutton(self.root, text="Email results to emails in ResultsMailingList.txt.", variable=self.email_results).grid(row=8, column=1, columnspan=3, sticky=W)
+        Checkbutton(self.root, text="Email results to ResultsMailingList.txt.", variable=self.email_results).grid(row=7, column=3, columnspan=2, sticky=W)
         
         #Status Indicator
         lbl5 = Label(self.root, text="Status:", width=10)
-        lbl5.grid(row=9, column=1)
-        self.lbl6 = Label(self.root, text="...Awaiting Inputs...", width=30)
-        self.lbl6.grid(row=9, column=2, columnspan=2)
+        lbl5.grid(row=10, column=1)
+        self.lbl6 = Label(self.root, text="Awaiting Inputs...", width=30)
+        self.lbl6.grid(row=10, column=2, columnspan=5)
         
         #Ok and close button
         
-        okButton = Button(self.root, text="Run", command=lambda: self.mainProgram(entry1.get(), entry2.get(),
-                    self.assetFile, trial_type.get(), self.admin_access.get(), self.test_case.get(), self.email_results.get()))
-        okButton.grid(row=10, column=2, sticky="WE")
+        okButton = Button(self.root, text="Run", command=lambda: self.mainProgram(MVUsername.get(), MVPassword.get(), RSQUsername.get(), RSQPassword.get(),
+                    self.assetFile, trial_type.get(), self.admin_access.get(), self.test_case.get(), self.email_results.get(), self.cross_checker.get()))
+        okButton.grid(row=11, column=2, sticky="WE")
         closeButton = Button(self.root, text="Close", command=sys.exit) #use quit to close window
-        closeButton.grid(row=10, column=3, sticky="E")
+        closeButton.grid(row=11, column=3, sticky="E")
 
         #Copyright Line
         lbl8 = Label(self.root, text="© Ryan Mooney Industries", width=10)
-        lbl8.grid(row=11, column=1, columnspan=3, sticky="WE")
+        lbl8.grid(row=12, column=1, columnspan=3, sticky="WE")
 
         self.centerWindow()
 
-    def mainProgram(self, username, password, assetfile, trial_type, admin_access, test_case, email_results): 
+    def mainProgram(self, MVUsername, MVPassword, RSQUsername, RSQPassword, assetfile, trial_type, admin_access, test_case, email_results, cross_checker): 
         #Compiles a dictionary with each asset and its descriptors
-        self.lbl6.config(text='...Finding assets...')
+        self.lbl6.config(text='Finding assets...')
         self.root.update()
 
         #Determines how to find asset locations
         if test_case==1:
             trial_type='TEST'
-            assetList, floor_counter, floor_list=get_asset_locations_test(username, password, assetListCreator(assetfile, trial_type), self.root, self.lbl6)
+            assetList, floor_counter, floor_list=get_asset_locations_test(MVUsername, MVPassword, assetListCreator(assetfile, trial_type), self.root, self.lbl6)
         elif admin_access==1:
-            assetList, floor_counter, floor_list=get_asset_locations_admin(username, password, assetListCreator(assetfile, trial_type), self.root, self.lbl6)
+            assetList, floor_counter, floor_list=get_asset_locations_admin(MVUsername, MVPassword, assetListCreator(assetfile, trial_type), self.root, self.lbl6)
         else:
-            assetList, floor_counter, floor_list=get_asset_locations_nonadmin(username, password, assetListCreator(assetfile, trial_type), self.root, self.lbl6)
+            assetList, floor_counter, floor_list=get_asset_locations_nonadmin(MVUsername, MVPassword, assetListCreator(assetfile, trial_type), self.root, self.lbl6)
         
         #Saves each new asset data point to database with unique 'trial' number
-        self.lbl6.config(text='...Saving Data...')
+        self.lbl6.config(text='Saving Data...')
         self.root.update()
         connection=connect()
         assetList, trial=assign_trial_number(assetList, connection, trial_type, test_case)
         save_to_db(assetList, self.root, self.lbl6, connection)
         connection.close()
 
+        #If only active PMs are wanted, we cross check them with an RSQ list and return only the assets with active PMs
+        if cross_checker==1:
+            activeAssets=crossCheckAssets(assetList, RSQUsername, RSQPassword)
+            trial_type=trial_type+' Active PMs Only'
+        else:
+            activeAssets='None'
+        
         #Creates and Exports Data to Excel
-        self.lbl6.config(text='...Exporting to Excel...')
+        self.lbl6.config(text='Exporting to Excel...')
         self.root.update()
-        file=exportToExcel(assetList, trial, floor_counter, floor_list, trial_type)
+        file=exportToExcel(assetList, trial, floor_counter, floor_list, trial_type, activeAssets)
 
         #Sends results to email addresses if requested
         if email_results==1:
-            self.lbl6.config(text='..Sending Emails...')
+            self.lbl6.config(text='Sending Emails...')
             self.root.update()
             email_file='./ResultsMailingList.txt'
             send_results(file, email_file)
@@ -166,8 +190,8 @@ class MainDialog(Frame):
         
     def centerWindow(self):
       
-        w = 300
-        h = 375
+        w = 475
+        h = 325
 
         sw = self.master.winfo_screenwidth()
         sh = self.master.winfo_screenheight()

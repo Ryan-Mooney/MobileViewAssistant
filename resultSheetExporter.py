@@ -4,7 +4,7 @@ from dbManagement import *
 import xlwt, datetime, os
 
 #Exports Data to Excel Report using the assetList
-def exportToExcel(assetList, trial, floor_counter, floor_list, trial_type):
+def exportToExcel(assetList, trial, floor_counter, floor_list, trial_type, activeAssets):
     book = xlwt.Workbook(encoding="utf-8")
     styleHeader=xlwt.easyxf('font: name Times New Roman, height 280, bold on')
     styleSubheader=xlwt.easyxf('font: name Times New Roman, height 240, bold on')
@@ -12,32 +12,12 @@ def exportToExcel(assetList, trial, floor_counter, floor_list, trial_type):
     styleSpecial=xlwt.easyxf('font: name Times New Roman, height 240, bold on; pattern: pattern solid, fore_colour light_green')
     styleLowBattery=xlwt.easyxf('font: name Times New Roman, height 240, colour red, bold on; pattern: pattern solid, fore_colour light_orange')
 
-    #Initializes first row for the Asset Info sheet
-    sheet1 = book.add_sheet("Asset Info")
-    sheet1.write(0, 0, "Asset", styleHeader)
-    sheet1.write(0, 1, "Location", styleHeader)
-    sheet1.write(0, 2, "Type", styleHeader)
-    sheet1.write(0, 3, "PM Month", styleHeader)
-    sheet1.write(0, 4, "Battery Life", styleHeader)
-    sheet1.col(0).width, sheet1.col(1).width, sheet1.col(2).width,  sheet1.col(3).width, sheet1.col(3).width = 5200, 9600, 7600, 6240, 4600
-    i=1
 
-    #A complete list of all the assets and their information
-    for asset in sorted(assetList.keys()):
-        sheet1.write(i, 0, asset, styleNormal)
-        sheet1.write(i, 1, assetList[asset]['Location'], styleNormal)
-        if assetList[asset]['Type']:
-            sheet1.write(i, 2, assetList[asset]['Type'], styleNormal)
-        if assetList[asset]['PM Month']:
-            sheet1.write(i, 3, assetList[asset]['PM Month'], styleNormal)
-        if assetList[asset]['Battery Status']:
-            if int(assetList[asset]['Battery Status'].strip('%'))<25:
-                sheet1.write(i, 4, assetList[asset]['Battery Status'], styleLowBattery)
-            else:
-                sheet1.write(i, 4, assetList[asset]['Battery Status'], styleNormal)
-        i+=1
-
-    #sheet1=autoAdjustColWidth(sheet1)
+    #Determines whether to print info for all assets or just for the ones with active PMs
+    if activeAssets == 'None':
+        book=addAssetList(assetList, 'All Asset Info', book)
+    else:
+        book=addAssetList(activeAssets, 'Asset Info for Active PMs', book)
     
     #Initializes first row for the Location Summary sheet
     sheet2 = book.add_sheet("Location Summary")
@@ -62,8 +42,6 @@ def exportToExcel(assetList, trial, floor_counter, floor_list, trial_type):
         sheet2.write(i, 2, total, styleSpecial)
         total=0
         i+=1
-
-    #sheet2=autoAdjustColWidth(sheet2)
     
     #Initializes first row for the Assets by Location sheet
     sheet3 = book.add_sheet("Assets by Location")
@@ -122,7 +100,7 @@ def exportToExcel(assetList, trial, floor_counter, floor_list, trial_type):
     
     #Creates name for File
     cwd=os.getcwd()
-    name='Asset Results'+' - Trial '+str(trial)+' - '+str(trial_type.replace(":",""))+' - '+str(datetime.datetime.today().strftime('%m-%d-%Y'))+'.xls'
+    name='Asset Results'+' - Trial '+str(trial)+' - '+str(trial_type.replace(":",""))+' - '+str(datetime.datetime.today().strftime('%m-%d-%Y'))+'.xlsx'
     print(name)
     try:
         os.mkdir(cwd+'\\Trial Results\\')
@@ -132,6 +110,39 @@ def exportToExcel(assetList, trial, floor_counter, floor_list, trial_type):
     name=cwd+'\\Trial Results\\'+name
     print(name)
     return(name)
+
+def addAssetList(assetList, sheetName, book):
+    styleHeader=xlwt.easyxf('font: name Times New Roman, height 280, bold on')
+    styleSubheader=xlwt.easyxf('font: name Times New Roman, height 240, bold on')
+    styleNormal=xlwt.easyxf('font: name Times New Roman, height 240')
+    styleSpecial=xlwt.easyxf('font: name Times New Roman, height 240, bold on; pattern: pattern solid, fore_colour light_green')
+    styleLowBattery=xlwt.easyxf('font: name Times New Roman, height 240, colour red, bold on; pattern: pattern solid, fore_colour light_orange')
+
+    #Initializes first row for the Asset Info sheet
+    sheet1 = book.add_sheet(sheetName)
+    sheet1.write(0, 0, "Asset", styleHeader)
+    sheet1.write(0, 1, "Location", styleHeader)
+    sheet1.write(0, 2, "Type", styleHeader)
+    sheet1.write(0, 3, "PM Month", styleHeader)
+    sheet1.write(0, 4, "Battery Life", styleHeader)
+    sheet1.col(0).width, sheet1.col(1).width, sheet1.col(2).width,  sheet1.col(3).width, sheet1.col(3).width = 5200, 9600, 7600, 6240, 4600
+    i=1
+
+    #A complete list of all the assets and their information
+    for asset in sorted(assetList.keys()):
+        sheet1.write(i, 0, asset, styleNormal)
+        sheet1.write(i, 1, assetList[asset]['Location'], styleNormal)
+        if assetList[asset]['Type']:
+            sheet1.write(i, 2, assetList[asset]['Type'], styleNormal)
+        if assetList[asset]['PM Month']:
+            sheet1.write(i, 3, assetList[asset]['PM Month'], styleNormal)
+        if assetList[asset]['Battery Status']:
+            if int(assetList[asset]['Battery Status'].strip('%'))<25:
+                sheet1.write(i, 4, assetList[asset]['Battery Status'], styleLowBattery)
+            else:
+                sheet1.write(i, 4, assetList[asset]['Battery Status'], styleNormal)
+        i+=1
+    return(book)
 
 def autoAdjustColWidth(worksheet):
     for col in worksheet.columns:

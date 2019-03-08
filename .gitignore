@@ -6,3 +6,7 @@ dist/.
 __pycache__
 assetdb.db
 ResultsMailingList.txt
+All-Mercy-Assets-2019.xlsx
+DefaultAssetList.xlsx
+Updated Mercy Asset List.xlsx
+credentials.py
