@@ -7,11 +7,10 @@ __pycache__
 assetdb.db
 ResultsMailingList.txt
 All-Mercy-Assets-2019.xlsx
-DefaultAssetList.xlsx
+*.xls
+*.xlsx
 "\Updated Mercy Asset List.xls"
 credentials.py
 debug.log
 MVAssistantPopupDialog.spec
 "\MV Assistant Application.lnk"
-*.xls
-*.xlsx
