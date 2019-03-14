@@ -13,3 +13,5 @@ credentials.py
 debug.log
 MVAssistantPopupDialog.spec
 MV Assistant Application.lnk
+*.xls
+*.xlsx
