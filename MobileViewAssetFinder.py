@@ -17,8 +17,11 @@ def get_asset_locations_test(username, password, assetList, root, lbl6):
     try:
         driver=webdriver.Ie()
         driver.close()
+        driver=webdriver.Chrome()
+        driver.close()
     except:
-        lbl6.config(text="Driver not set up")
+        lbl6.config(text="Drivers not set up. Check readme and ensure both are in PATH.")
+        root.update()
         return()
     for asset in assetList:
         random_floor=possible_floors[random.randrange(len(possible_floors))]
@@ -48,7 +51,7 @@ def get_asset_locations_test(username, password, assetList, root, lbl6):
 def get_asset_locations_admin(username, password, assetList, root, lbl6):
     #Initialize driver and travel to Mobileview
     driver = webdriver.Ie()
-    driver.get(MV_URL)
+    driver.get("http://mobileview/asset-manager-web/core/pages/login/login.jsf")
 
     #Login to Mobileview
     elem = driver.find_element_by_name("j_username")
@@ -209,7 +212,7 @@ def get_asset_locations_nonadmin(username, password, assetList, root, lbl6):
     driver.close()
     return(assetList, floor_counter, floor_list)
 
-def crossCheckAssets(assetList, username, password):
+def crossCheckAssets(assetList, username, password, root, lbl6):
     #Initialize driver and travel to RSQ
     chrome_options=Options()
     chrome_options.add_argument("--headless")
@@ -231,7 +234,8 @@ def crossCheckAssets(assetList, username, password):
     driver.switch_to.frame("gsft_main")
 
     #Search for Asset Info by Serial Numbers
-    #driver.switch_to.frame("gsft_main")
+    driver.find_element_by_xpath('//*[contains(@id, "_select")]').click()
+    driver.find_element_by_xpath('//*[contains(@value, "u_ceid.serial_number")]').click()
     month=datetime.datetime.today().strftime('%m')
     if month[0]=='0':
         month=float(month[1])
@@ -240,6 +244,7 @@ def crossCheckAssets(assetList, username, password):
     else:
         lastMonth=float(str(int(month)-1))
     activeAssets={}
+    i=1
     for asset in assetList:
         if float(assetList[asset]['PM Month Number'])==month or float(assetList[asset]['PM Month Number'])==lastMonth:
             #This part searches the current PM List for the asset using its Serial Number
@@ -251,12 +256,81 @@ def crossCheckAssets(assetList, username, password):
             #Searches page for any results
             elem=driver.find_elements_by_xpath('//*[contains(@href, "u_cmdb_ci_equipment")]')
             if elem:
-                activeAssets.update({asset: assetList[asset]})
+                activeAssets[asset]=assetList[asset]
             #Progress Bar
             lbl6.config(text="Cross checking for active PMs..."+str(int(i/len(assetList)*100))+"% Complete")
             i+=1
         root.update()
     driver.close()
     return(activeAssets)
+
+def checkCredentials(MVUsername, MVPassword, RSQUsername, RSQPassword, cross_checker, root, lbl6):
+    #Checks to make sure credentials are right for each site before continuing
+    credentials_correct="YES"
+    #Initialize driver and travel to Mobileview
+    lbl6.config(text="Checking MobileView credentials...")
+    root.update()
+    driver = webdriver.Ie()
+    driver.get("http://mobileview/asset-manager-web/core/pages/login/login.jsf")
+
+    #Login to Mobileview
+    elem = driver.find_element_by_name("j_username")
+    elem.clear()
+    elem.send_keys(MVUsername)
+    elem = driver.find_element_by_name("j_password")
+    elem.clear()
+    elem.send_keys(MVPassword)
+    elem.send_keys(Keys.RETURN)
+
+    #If login is successful, menu will be clickable
+    try:
+        element=WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "systemMenu")))
+    #Updates status bar to indicate credentials are correct or continues on with test
+    except:
+        lbl6.config(text="MobileView username/password incorrect. Try again.")
+        root.update()
+        credentials_correct="NO"
+        driver.close()
+        return(credentials_correct)
+    lbl6.config(text="MobileView username/password correct. Continuing...")
+    root.update()
+    driver.close()
+
+    #Checks RSQ credentials if needed
+    if cross_checker==1:
+        #Initialize driver and travel to RSQ
+        lbl6.config(text="Checking RSQ credentials...")
+        root.update()
+        chrome_options=Options()
+        chrome_options.add_argument("--headless")
+        chrome_options.binary_location = r'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe'
+        driver = webdriver.Chrome(options=chrome_options)
+        driver.get("https://trimedx.service-now.com/nav_to.do?uri=%2Fwm_task_list.do%3Fsysparm_query%3Du_work_order_type%253DPreventative%2520Maintenance%255EstateNOT%2520IN3%252C-10%255Ecompany.u_cost_center%253D8380%26sysparm_first_row%3D1%26sysparm_view%3D")
+        time.sleep(3)
+        driver.switch_to.frame("gsft_main")
+
+        #Login to RSQ
+        elem = driver.find_element_by_id(id_="user_name")
+        elem.clear()
+        elem.send_keys(RSQUsername)
+        elem = driver.find_element_by_id(id_="user_password")
+        elem.clear()
+        elem.send_keys(RSQPassword)
+        elem = driver.find_element_by_id(id_="sysverb_login").click()
+        time.sleep(3)
+
+        #If login is successfull, frame switching will be possible
+        try:
+            driver.switch_to.frame("gsft_main")
+        except:
+            lbl6.config(text="RSQ username/password incorrect. Try again.")
+            root.update()
+            credentials_correct="NO"
+            driver.close()
+            return(credentials_correct)
+        lbl6.config(text="RSQ username/password correct. Continuing...")
+        root.update()
+        driver.close()
+    return(credentials_correct)
                 
     

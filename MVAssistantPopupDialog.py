@@ -1,10 +1,13 @@
 #Mobileview Assistant - Asset Finder and Organizer
 #Developed by Ryan Mooney, BMET II, at Mercy Medical Center - Cedar Rapids, IA
 
-#Requires IEDriverSoftware, found here: https://stackoverflow.com/questions/24925095/selenium-python-internet-explorer
+#Requires IEDriverSoftware and ChromeDriver
+    #found here: https://stackoverflow.com/questions/24925095/selenium-python-internet-explorer
+    #and here: http://chromedriver.chromium.org/
     #Use 32 bit one
-    #IEDriver must also be added to PATH to function properly
-#Additionally requires the Selenium library for python
+    #Drivers must also be added to PATH to function properly
+#To compile this yourself, install pyinstaller and run this in the current directory:
+#pyinstaller --paths C:\Windows\WinSxS\x86_microsoft-windows-m..namespace-downlevel_31bf3856ad364e35_10.0.17134.1_none_50c6cb8431e7428f --hidden-import tkinter MVAssistantPopupDialog.py
 
 
 import os, time, sys
@@ -124,7 +127,7 @@ class MainDialog(Frame):
         #Status Indicator
         lbl5 = Label(self.root, text="Status:", width=10)
         lbl5.grid(row=10, column=1)
-        self.lbl6 = Label(self.root, text="Awaiting Inputs...", width=30)
+        self.lbl6 = Label(self.root, text="Awaiting Inputs...", width=50)
         self.lbl6.grid(row=10, column=2, columnspan=5)
         
         #Ok and close button
@@ -142,8 +145,13 @@ class MainDialog(Frame):
         self.centerWindow()
 
     def mainProgram(self, MVUsername, MVPassword, RSQUsername, RSQPassword, assetfile, trial_type, admin_access, test_case, email_results, cross_checker): 
+        #Checks credentials before continuing
+        credentials_correct = checkCredentials(MVUsername, MVPassword, RSQUsername, RSQPassword, cross_checker, self.root, self.lbl6)
+        if credentials_correct=="NO":
+            return()
+
         #Compiles a dictionary with each asset and its descriptors
-        self.lbl6.config(text='Finding assets...')
+        self.lbl6.config(text='Finding Assets...')
         self.root.update()
 
         #Determines how to find asset locations
@@ -165,7 +173,9 @@ class MainDialog(Frame):
 
         #If only active PMs are wanted, we cross check them with an RSQ list and return only the assets with active PMs
         if cross_checker==1:
-            activeAssets=crossCheckAssets(assetList, RSQUsername, RSQPassword)
+            self.lbl6.config(text='Cross checking for active PMs...')
+            self.root.update()
+            activeAssets=crossCheckAssets(assetList, RSQUsername, RSQPassword, self.root, self.lbl6)
             trial_type=trial_type+' Active PMs Only'
         else:
             activeAssets='None'

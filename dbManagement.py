@@ -59,7 +59,7 @@ def save_to_db(assetList, root, lbl6, connection):
         #Saves each datapoint to database
         create_asset_data(asset_data, sql_text, values_text, cur)
         #Progress Bar
-        lbl6.config(text="...Saving Data..."+str(int(i/len(assetList.keys())*100))+"% Complete")
+        lbl6.config(text="Saving Data..."+str(int(i/len(assetList.keys())*100))+"% Complete")
         i+=1
         root.update()
 
