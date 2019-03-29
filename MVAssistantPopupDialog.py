@@ -114,7 +114,7 @@ class MainDialog(Frame):
 
         #Active PMs only Checker
         self.cross_checker=IntVar(value=1)
-        Checkbutton(self.root, text="Print only the active PMs.", variable=self.admin_access).grid(row=7, column=1, columnspan=2, sticky=W)
+        Checkbutton(self.root, text="Print only the active PMs.", variable=self.cross_checker).grid(row=7, column=1, columnspan=2, sticky=W)
 
         #Run a test only Checker
         self.test_case=IntVar(value=0)
